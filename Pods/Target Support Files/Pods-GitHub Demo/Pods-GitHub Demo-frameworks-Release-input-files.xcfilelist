@@ -1,0 +1,6 @@
+${PODS_ROOT}/Target Support Files/Pods-GitHub Demo/Pods-GitHub Demo-frameworks.sh
+${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework
+${BUILT_PRODUCTS_DIR}/IQKeyboardManager/IQKeyboardManager.framework
+${BUILT_PRODUCTS_DIR}/Moya/Moya.framework
+${BUILT_PRODUCTS_DIR}/NavigationStack/NavigationStack.framework
+${BUILT_PRODUCTS_DIR}/ProgressHUD/ProgressHUD.framework

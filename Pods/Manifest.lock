@@ -1,0 +1,34 @@
+PODS:
+  - Alamofire (5.10.2)
+  - IQKeyboardManager (6.5.19)
+  - Moya (15.0.0):
+    - Moya/Core (= 15.0.0)
+  - Moya/Core (15.0.0):
+    - Alamofire (~> 5.0)
+  - NavigationStack (1.0.4)
+  - ProgressHUD (14.1.1)
+
+DEPENDENCIES:
+  - IQKeyboardManager
+  - Moya
+  - NavigationStack
+  - ProgressHUD
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - IQKeyboardManager
+    - Moya
+    - NavigationStack
+    - ProgressHUD
+
+SPEC CHECKSUMS:
+  Alamofire: 7193b3b92c74a07f85569e1a6c4f4237291e7496
+  IQKeyboardManager: c8665b3396bd0b79402b4c573eac345a31c7d485
+  Moya: 138f0573e53411fb3dc17016add0b748dfbd78ee
+  NavigationStack: c2fb4c71b89659481e8e0dfb20e533681dce084f
+  ProgressHUD: abb9136ae23c85204236828562cb9a8ec98efb44
+
+PODFILE CHECKSUM: eadc93fe8e34f6103bbcab11b13234779fb9dd2b
+
+COCOAPODS: 1.16.2
