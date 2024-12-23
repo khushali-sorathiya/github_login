@@ -12,7 +12,7 @@ let udf : UDF = UDF()
 
 enum DefaultKey : String {
     
-    case userName = "user_name"
+    case accessToken = "access_token"
     case userData = "User_Data"
    
 }
@@ -39,6 +39,9 @@ public struct UDF {
         
     }
 
+    func accessToken() -> String {
+        return UserDefaults.standard.string(forKey: DefaultKey.accessToken.rawValue)  ?? ""
+    }
     
     func userResult() -> UserResult {
         if let savedData = UserDefaults.standard.data(forKey: DefaultKey.userData.rawValue) {

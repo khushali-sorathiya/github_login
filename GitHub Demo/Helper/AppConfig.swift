@@ -20,13 +20,16 @@ struct AppConfig {
         static let baseUrl: String = {
              return isDebug ? "https://github.com/" : "https://github.com/"
         }()
+    
+    static let repobaseURL :String = {
+        return isDebug ? "https://api.github.com/" : "https://api.github.com/"
+   }()
         
        
         static let clientID = "Iv23lirq7KQ5Q8OUG6Ds"
         static let clientSecret = "9acdbcc14b3a375ce59791a9ac5edb99575b6244"
         static let redirectURI = "myapp://callback"
         static let authorizationURL = "login/oauth/authorize"
-        static let tokenURL = "https://github.com/login/oauth/access_token"
         static let scope = "repo user"
         static let repoURL = "https://api.github.com/user/repos"
        

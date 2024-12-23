@@ -13,36 +13,39 @@ import Moya
 enum GitServices{
     
     case login(param: [String: Any])
-    case dashboard(param: [String: Any])
+    case dashboard(page: Int, perPage: Int)
   
 }
 
 extension GitServices: TargetType{
-    
+   
     var baseURL: URL {
-        return URL(string: AppConfig.baseUrl)!
+        switch self{
+        case .dashboard: return URL(string: AppConfig.repobaseURL)!
+        default :
+            return URL(string: AppConfig.baseUrl)!
+        }
+        
    }
     
     public var path: String{
         switch self{
             
         case .login: return "login/oauth/access_token"
-        case .dashboard: return "Dashboard"
+        case .dashboard: return "user/repos"
            
         }
     }
     
     public var method: Moya.Method{
         
-        return .post
-        
-//        switch self{
-//        case .twilioVoiceToken(_):
-//            return .get
-//            
-//        default :
-//            return .post
-//        }
+        switch self{
+        case .dashboard:
+            return .get
+            
+        default :
+            return .post
+        }
     }
     
     public var sampleData: Data {
@@ -51,19 +54,24 @@ extension GitServices: TargetType{
     
     public var task: Task{
         switch self{
-            
-        case .login(let param),
-                .dashboard(let param)
-            :
+        case .dashboard(let page, let perPage):
+                    return .requestParameters(
+                        parameters: ["page": page, "per_page": perPage],
+                        encoding: URLEncoding.queryString
+                    )
+                
+        case .login(let param) :
             return .requestParameters(parameters: param, encoding: URLEncoding.default)
-                     
         default :
             return .requestPlain
         }
     }
     
     public var headers: [String : String]?{
-        return nil
+        if udf.accessToken().isEmpty {
+            return nil
+        }
+        return ["Authorization": "Bearer \(udf.accessToken())"]
     }
 }
 

@@ -13,6 +13,8 @@ import SafariServices
 
 struct LoginVC: View {
     
+    @EnvironmentObject var authManager: GitHubAuthManager
+    
     //MARK: Body
     var body: some View {
         ZStack {
@@ -38,6 +40,9 @@ struct LoginVC: View {
                     }
         }.onAppear(perform: viewDidLoad)
             .edgesIgnoringSafeArea(.bottom)
+            .navigationDestination(isPresented: $authManager.isAuthenticated) {
+                DashboardVC(accessToken: authManager.accessToken ?? "")
+                        }
     }
     
     func viewDidLoad() {
@@ -50,7 +55,9 @@ struct LoginVC: View {
             }
             UIApplication.shared.open(url)
     }
-   
+    
+  
+    
 }
 
 struct LoginVC_Previews: PreviewProvider {
