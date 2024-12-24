@@ -66,13 +66,13 @@ class GitHubAuthManager: ObservableObject {
                     if let accessToken = parsedResponse["access_token"] {
                         DispatchQueue.main.async {
                             self.accessToken = accessToken
-                            //udf.setObject(value: accessToken, key: .accessToken)
+                            udf.setObject(value: accessToken, key: .accessToken)
                         }
                     } else {
                         print("Failed to fetch access token from response: \(parsedResponse)")
                     }
                     
-                case let .failure(error):
+                case .failure(_):
                     print(StringMsg.wrong)
                 }
             }
@@ -99,16 +99,16 @@ class GitHubAuthManager: ObservableObject {
 
 class RepositoryViewModel: ObservableObject {
     @Published var repositories: [Repository] = []
-    
+    @Published var unAuthorized : Bool = false
     @Published var isLoading = false
     @Published var errorMessage: String?
     private var currentPage = 1
     private var limit = 3
-    @Published var isLastPage = false
+    @Published var loadMore = true
     
     
     func fetchRepositories(isLoadingMore: Bool = false) {
-        guard !isLoading, !isLastPage else { return }
+        guard !isLoading, loadMore else { return }
         
         isLoading = true
         if Reachability.isConnectedToNetwork() {
@@ -129,17 +129,22 @@ class RepositoryViewModel: ObservableObject {
                             }
                             self.currentPage += 1
                             if repos.count < self.limit {
-                                self.isLastPage = true
+                                self.loadMore = false
                             }
                         }
                     } else {
                         print("Failed to decode repositories")
-                        self.isLastPage = true
+                        self.loadMore = false
+                        if response.statusCode == 401 {
+                            udf.removeAllObject()
+                            self.unAuthorized = true
+                        }
+                        
                     }
                     
                 case let .failure(error):
                     print(error.localizedDescription)
-                    self.isLastPage = true
+                    self.loadMore = false
                 }
             }
         }else{
@@ -149,7 +154,7 @@ class RepositoryViewModel: ObservableObject {
     
     func resetPagination() {
         currentPage = 1
-        isLastPage = false
+        loadMore = true
         repositories = []
         fetchRepositories()
     }

@@ -17,46 +17,51 @@ struct LoginVC: View {
     
     //MARK: Body
     var body: some View {
-        ZStack {
-            VStack {
-                        Spacer()
-                        Button(action: {
-                            loginWithGitHub()
-                        }) {
-                            HStack(spacing: 10) {
-                                Image(systemName: "person.fill")
-                                    .foregroundColor(.white)
-                                Text("Login with GitHub")
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.white)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.black)
-                            .cornerRadius(8)
+        NavigationStack {
+            ZStack {
+                VStack {
+                    Spacer()
+                    Button(action: {
+                        loginWithGitHub()
+                    }) {
+                        HStack(spacing: 10) {
+                            Image(systemName: "person.fill")
+                                .foregroundColor(.white)
+                            Text("Login with GitHub")
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
                         }
-                        .padding(.horizontal, 16)
-                        Spacer()
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.black)
+                        .cornerRadius(8)
                     }
-        }.onAppear(perform: viewDidLoad)
+                    .padding(.horizontal, 16)
+                    Spacer()
+                }
+            }
+            .onAppear(perform: viewDidLoad)
             .edgesIgnoringSafeArea(.bottom)
             .navigationDestination(isPresented: $authManager.isAuthenticated) {
                 DashboardVC(accessToken: authManager.accessToken ?? "")
-                        }
+            }
+        }
     }
     
     func viewDidLoad() {
-        
+        authManager.isAuthenticated = false
+        authManager.accessToken = nil
+        udf.removeAllObject()
     }
     
     func loginWithGitHub() {
         guard let url = URL(string: "\(AppConfig.baseUrl)\(AppConfig.authorizationURL)?client_id=\(AppConfig.clientID)&redirect_uri=\(AppConfig.redirectURI)&scope=\(AppConfig.scope)") else {
-                return
-            }
-            UIApplication.shared.open(url)
+            return
+        }
+        UIApplication.shared.open(url)
     }
     
-  
+    
     
 }
 
