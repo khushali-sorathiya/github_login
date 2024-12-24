@@ -11,20 +11,14 @@ import Foundation
 struct UserDataModel : Codable {
     
     let accesstoken : String?
-//    let statusMessage : String?
-//    let result : [UserResult]?
-    
+
     enum CodingKeys: String, CodingKey {
         case accesstoken = "access_token"
-//        case statusMessage = "StatusMessage"
-//        case result = "Result"
     }
     
     init(from decoder: Decoder) throws {
         let values = try? decoder.container(keyedBy: CodingKeys.self)
         accesstoken = try? values?.decodeIfPresent(String.self, forKey: .accesstoken)
-//        statusMessage = try? values?.decodeIfPresent(String.self, forKey: .statusMessage)
-//        result = try? values?.decodeIfPresent([UserResult].self, forKey: .result)
     }
 }
 

@@ -28,6 +28,7 @@ struct DashboardVC: View {
                                 .fontWeight(.bold)
                             Spacer()
                             Button(action: {
+                                viewModel.clearRepoData()
                                 viewModel.unAuthorized = true
                                 authManager.accessToken = nil
                                 authManager.isAuthenticated = false
@@ -92,7 +93,7 @@ struct DashboardVC: View {
                                                     .resizable()
                                                     .foregroundColor(.gray)
                                                     .frame(width: 13, height: 13)
-                                                HStack(spacing:1) {
+                                                HStack(spacing:3) {
                                                     Text("\(repo.stargazersCount)")
                                                         .fontWeight(.medium)
                                                     Text("star")
@@ -104,7 +105,7 @@ struct DashboardVC: View {
                                                     .resizable()
                                                     .frame(width: 13, height: 13)
                                                     .foregroundColor(.gray)
-                                                HStack(spacing:1) {
+                                                HStack(spacing:3) {
                                                     Text("\(repo.forksCount)")
                                                         .fontWeight(.medium)
                                                     Text("forks")
@@ -126,7 +127,7 @@ struct DashboardVC: View {
                                             }
                                         }
                             }
-                            if viewModel.isLoading {
+                            if viewModel.isLoading && !viewModel.isOffline {
                                 ProgressView()
                                     .frame(maxWidth: .infinity, alignment: .center)
                             }

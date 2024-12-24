@@ -7,9 +7,7 @@
 
 import Foundation
 import ProgressHUD
-
-
-//let githubVM = GithubViewModel()
+import CoreData
 
 func showLoader() {
     ProgressHUD.marginSize = 20
@@ -79,8 +77,7 @@ class GitHubAuthManager: ObservableObject {
         }else{
             print(StringMsg.noInternet.rawValue)
         }
-        
-    }
+   }
     
     func parseURLEncodedResponse(_ response: String) -> [String: String] {
         var result = [String: String]()
@@ -106,6 +103,8 @@ class RepositoryViewModel: ObservableObject {
     private var limit = 3
     @Published var loadMore = true
     
+    @Published var isOffline: Bool = false
+    private let persistenceController = PersistenceController.shared
     
     func fetchRepositories(isLoadingMore: Bool = false) {
         guard !isLoading, loadMore else { return }
@@ -127,6 +126,7 @@ class RepositoryViewModel: ObservableObject {
                             } else {
                                 self.repositories = repos
                             }
+                            self.saveRepositoriesToCoreData(repos)
                             self.currentPage += 1
                             if repos.count < self.limit {
                                 self.loadMore = false
@@ -149,6 +149,9 @@ class RepositoryViewModel: ObservableObject {
             }
         }else{
             print(StringMsg.noInternet.rawValue)
+            loadRepositoriesFromCoreData()
+            isOffline = true
+            
         }
     }
     
@@ -157,6 +160,76 @@ class RepositoryViewModel: ObservableObject {
         loadMore = true
         repositories = []
         fetchRepositories()
+    }
+    
+    
+    private func saveRepositoriesToCoreData(_ repositories: [Repository]) {
+        let context = persistenceController.container.viewContext
+        
+        let fetchRequest: NSFetchRequest<Gitrepo> = Gitrepo.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id IN %@", repositories.map { $0.id })
+        
+        do {
+            let existRepo = try context.fetch(fetchRequest)
+            
+            let existRepoDict = Dictionary(uniqueKeysWithValues: existRepo.map { ($0.id, $0) })
+            
+            for repo in repositories {
+                if let existrepo = existRepoDict[Int64(repo.id)] {
+                    existrepo.name = repo.name
+                    existrepo.repoDescription = repo.description
+                    existrepo.stargazersCount = Int64(repo.stargazersCount)
+                    existrepo.forksCount = Int64(repo.forksCount)
+                    existrepo.lastUpdate = repo.lastupdate
+                } else {
+                    let repositoryEntity = Gitrepo(context: context)
+                    repositoryEntity.id = Int64(repo.id)
+                    repositoryEntity.name = repo.name
+                    repositoryEntity.repoDescription = repo.description
+                    repositoryEntity.stargazersCount = Int64(repo.stargazersCount)
+                    repositoryEntity.forksCount = Int64(repo.forksCount)
+                    repositoryEntity.lastUpdate = repo.lastupdate
+                }
+            }
+            
+            try context.save()
+            
+        } catch {
+            print("Failed to load core data: \(error)")
+        }
+    }
+    
+    private func loadRepositoriesFromCoreData() {
+        let context = persistenceController.container.viewContext
+        let fetchRequest: NSFetchRequest<Gitrepo> = Gitrepo.fetchRequest()
+        do {
+            let fetchedRepositories = try context.fetch(fetchRequest)
+            self.repositories = fetchedRepositories.map { repo in
+                Repository(
+                    id: Int(repo.id),
+                    name: repo.name ?? "",
+                    description: repo.repoDescription,
+                    stargazersCount: Int(repo.stargazersCount),
+                    forksCount: Int(repo.forksCount),
+                    lastupdate: repo.lastUpdate ?? ""
+                )
+            }
+        } catch {
+            print("Failed to load core data: \(error)")
+        }
+    }
+    
+    func clearRepoData() {
+        let context = persistenceController.container.viewContext
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = Gitrepo.fetchRequest()
+        let delete = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        
+        do {
+            try context.execute(delete)
+            try context.save()
+        } catch {
+            print("Failed delete: \(error)")
+        }
     }
 }
 
